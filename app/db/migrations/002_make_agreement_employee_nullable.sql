@@ -1,0 +1,2 @@
+ALTER TABLE agreement
+ALTER COLUMN employee_id DROP NOT NULL;

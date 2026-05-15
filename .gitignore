@@ -1,0 +1,29 @@
+# environment
+.env
+.env.*
+!.env.example
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# node/frontend
+node_modules/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# local/db
+*.sqlite
+*.db
+
+# docs/private
+AGENTS.md
+business logic.md
+backend.md
+database.md
+docs/private/
