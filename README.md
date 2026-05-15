@@ -50,6 +50,18 @@ For production, use `DEBUG=false` and set `TELEGRAM_BOT_TOKEN`. In this mode
 Telegram `hash`; arbitrary JSON is rejected. The frontend should send
 `window.Telegram.WebApp.initData` as a string.
 
+## CORS
+
+Frontend and backend can run on different domains, for example Vercel for the
+frontend and Render for the API. Set allowed frontend origins in `.env`:
+
+```env
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://frontend.vercel.app
+```
+
+Use only the real frontend domain in production. The backend allows `Authorization:
+Bearer <JWT>` headers and handles browser preflight `OPTIONS` requests automatically.
+
 ## Run
 
 ```bash
