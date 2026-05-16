@@ -1,34 +1,34 @@
-# Telegram Mini App Car Rental Backend
+# Бэкенд аренды автомобилей для Telegram Mini App
 
-FastAPI MVP backend for a Telegram Mini App car rental service.
+MVP-бэкенд на FastAPI для сервиса аренды автомобилей в Telegram Mini App.
 
-## Stack
+## Стек
 
 - FastAPI
 - PostgreSQL
 - asyncpg
-- Layered architecture: controller -> service -> repository -> db
+- Слоистая архитектура: контроллер -> сервис -> репозиторий -> база данных
 
-## Setup
+## Настройка
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
+1. Создайте и активируйте виртуальное окружение.
+2. Установите зависимости:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Create PostgreSQL database using the schema described in `docs/database.md`.
-4. Copy environment example:
+3. Создайте базу PostgreSQL по схеме из `docs/database.md`.
+4. Скопируйте пример окружения:
 
 ```bash
 cp .env.example .env
 ```
 
-5. Set `DATABASE_URL` and replace `JWT_SECRET` in `.env`.
+5. Укажите `DATABASE_URL` и замените `JWT_SECRET` в `.env`.
 
-For local development and Swagger checks, `DEBUG=true` makes `POST /auth/telegram`
-accept debug auth. You can send:
+Для локальной разработки и проверки Swagger можно включить `DEBUG=true`.
+В этом режиме `POST /auth/telegram` принимает debug-авторизацию:
 
 ```json
 {
@@ -36,7 +36,7 @@ accept debug auth. You can send:
 }
 ```
 
-The backend authenticates as:
+Бэкенд авторизует пользователя как:
 
 ```json
 {
@@ -45,62 +45,63 @@ The backend authenticates as:
 }
 ```
 
-For production, use `DEBUG=false` and set `TELEGRAM_BOT_TOKEN`. In this mode
-`POST /auth/telegram` accepts only real Telegram WebApp init data with a valid
-Telegram `hash`; arbitrary JSON is rejected. The frontend should send
-`window.Telegram.WebApp.initData` as a string.
+Для продакшена используйте `DEBUG=false` и задайте `TELEGRAM_BOT_TOKEN`.
+В этом режиме `POST /auth/telegram` принимает только настоящие Telegram WebApp
+init data с валидным Telegram `hash`; произвольный JSON будет отклонён.
+Фронтенд должен отправлять `window.Telegram.WebApp.initData` строкой.
 
 ## CORS
 
-Frontend and backend can run on different domains, for example Vercel for the
-frontend and Render for the API. Set allowed frontend origins in `.env`:
+Фронтенд и бэкенд могут работать на разных доменах, например фронтенд на Vercel,
+а API на Render. Разрешённые origins фронтенда задаются в `.env`:
 
 ```env
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://frontend.vercel.app
 ```
 
-Use only the real frontend domain in production. The backend allows `Authorization:
-Bearer <JWT>` headers and handles browser preflight `OPTIONS` requests automatically.
+В продакшене оставляйте только реальный домен фронтенда. Бэкенд разрешает заголовок
+`Authorization: Bearer <JWT>` и автоматически обрабатывает браузерные preflight-запросы `OPTIONS`.
 
-## Run
+## Запуск
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Swagger UI is available at:
+Swagger UI доступен по адресу:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-## Tests
+## Тесты
 
-Install dependencies, then run:
+Установите зависимости, затем запустите:
 
 ```bash
 pytest
 ```
 
-or:
+или:
 
 ```bash
 pytest tests/
 ```
 
-Tests use API-level requests against the FastAPI app and wrap database changes in a
-transaction that is rolled back after each test. Set `TEST_DATABASE_URL` to point at a
-separate test database when running outside local development.
+Тесты отправляют API-запросы к FastAPI-приложению и оборачивают изменения базы данных
+в транзакцию, которая откатывается после каждого теста. При запуске вне локальной
+разработки задайте `TEST_DATABASE_URL`, чтобы использовать отдельную тестовую базу.
 
-## Auth Context
+## Контекст авторизации
 
-After `POST /auth/telegram`, use the returned JWT access token for protected actions:
+После `POST /auth/telegram` используйте возвращённый JWT access token для
+защищённых действий:
 
 ```http
 Authorization: Bearer <access_token>
 ```
 
-`POST /auth/telegram` returns:
+`POST /auth/telegram` возвращает:
 
 ```json
 {
@@ -116,7 +117,7 @@ Authorization: Bearer <access_token>
 }
 ```
 
-Protected endpoints:
+Защищённые эндпоинты:
 
 - `GET /user/me`
 - `PATCH /user/me`
@@ -135,7 +136,7 @@ Protected endpoints:
 - `PATCH /admin/cars/{car_id}`
 - `DELETE /admin/cars/{car_id}`
 
-Public endpoints:
+Публичные эндпоинты:
 
 - `POST /auth/telegram`
 - `GET /branches`
@@ -143,17 +144,17 @@ Public endpoints:
 - `GET /cars?branch_id=`
 - `POST /availability/check`
 
-## Client Profile
+## Профиль клиента
 
-Before creating a booking or agreement, the client profile must be completed.
-The database field `client.profile_completed` is true only when all profile fields are
-filled:
+Перед созданием бронирования или договора профиль клиента должен быть заполнен.
+Поле базы `client.profile_completed` равно `true` только когда заполнены все
+поля профиля:
 
 - `full_name`
 - `age`
 - `license_no`
 
-Apply the migration before running this version:
+Перед запуском этой версии примените миграции:
 
 ```sql
 \i app/db/migrations/001_add_client_profile_completed.sql
@@ -161,7 +162,7 @@ Apply the migration before running this version:
 \i app/db/migrations/003_add_employee_client_id.sql
 ```
 
-If the profile is incomplete, `POST /booking` and `POST /agreement` return:
+Если профиль не заполнен, `POST /booking` и `POST /agreement` возвращают:
 
 ```json
 {
@@ -170,7 +171,7 @@ If the profile is incomplete, `POST /booking` and `POST /agreement` return:
 }
 ```
 
-## Implemented Endpoints
+## Реализованные эндпоинты
 
 - `POST /auth/telegram`
 - `GET /user/me`
@@ -194,20 +195,20 @@ If the profile is incomplete, `POST /booking` and `POST /agreement` return:
 - `PATCH /admin/cars/{car_id}`
 - `DELETE /admin/cars/{car_id}`
 
-## Admin Access
+## Доступ администратора
 
-Admin endpoints use the same JWT bearer token as client endpoints. A user is an admin
-only when the `employee` table has a row with:
+Административные эндпоинты используют тот же JWT bearer token, что и клиентские эндпоинты.
+Пользователь считается администратором только если в таблице `employee` есть строка:
 
 ```sql
 employee.client_id = client.client_id
 ```
 
-`GET /user/me` returns `is_admin: true` for this case, so the frontend can show
-admin UI without probing `/admin/*` first.
+В этом случае `GET /user/me` возвращает `is_admin: true`, и фронтенд может
+показать admin UI без пробного обращения к `/admin/*`.
 
-Do not use `client_id = employee_id`. If the user has no employee row, `/admin/*`
-returns:
+Не используйте `client_id = employee_id`. Если у пользователя нет строки
+`employee`, `/admin/*` возвращает:
 
 ```json
 {
@@ -216,14 +217,15 @@ returns:
 }
 ```
 
-## Booking Expiration
+## Истечение бронирований
 
-The app starts a background system task that periodically expires bookings where:
+Приложение запускает фоновую системную задачу, которая периодически истекает
+бронирования по условию:
 
 ```sql
 reserved_until < NOW()
 AND status = 'pending'
 ```
 
-Expired bookings are moved to `expired`, and cars in `reserved` status are released to
-`available` when no active booking remains for the car.
+Истёкшие бронирования переводятся в `expired`, а автомобили в статусе `reserved`
+освобождаются в `available`, если для автомобиля больше нет активной брони.
